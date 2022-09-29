@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB</title>
+</head>
+<body>
+    <script>
+
+        var db;
+        var request = window.indexedDB.open("MyDatabase", 2);
+       
+        request.onupgradeneeded = function (event){
+            db = event.target.result;
+            var objectStore = db.createObjectStore("students", {keyPath: "usi" });
+        };
+
+        request.onsuccess = function(event){
+            db = event.target.result;
+            
+            //INSERT
+            /*
+            var transaction = db.transaction("students", "readwrite");
+            var studentsObjectStore = transaction.objectStore("students");
+            
+            let student = {
+                    usi: "3d23fv",
+                    name: "Ben Lord",
+                    email: "ben@mysite.com",
+                    age: 26
+            }
+
+            let request = studentsObjectStore.add(student);
+
+            request.onsuccess = function(){
+                console.log("Student added to the store", request.result)
+            }
+
+            request.onerror = function(){
+                console.log("Error", request.error)
+            };*/
+
+            //DELETE
+            /*
+            var transaction = db.transaction("students", "readwrite");
+            var studentsObjectStore = transaction.objectStore("students");
+            var request = studentsObjectStore.delete("3d23fv");
+
+            request.onsuccess = function (event){
+                console.log("Student successfully deleted from DB.")
+            }
+            request.onerror = function (){
+                console.log("Error", request.error);
+            }
+            */
+
+            //READ
+            /*
+            db.transaction("students").objectStore("students").get("3d23fv").onsuccess = function (event){
+
+                let studentObj = event.target.result;
+                console.log(studentObj.usi);
+                console.log(studentObj.name);
+                console.log(studentObj.email);
+                console.log(studentObj.age);
+            }*/
+
+            //UPDATE
+            /*
+            var studentsObjectStore = db.transaction("students", "readwrite").objectStore("students");
+
+            studentsObjectStore.get("3d23fv").onsuccess = function(event){
+
+                let studentObj = event.target.result;
+                studentObj.age = 27;                
+                var requestUpdate = studentsObjectStore.put(studentObj);
+
+                requestUpdate.onerror = function(event){
+                    console.log("Error", requestUpdate.error);
+                }
+                requestUpdate.onsuccess = function(event){
+                    console.log("Student successfully updated.");
+                }
+
+
+            }*/
+            /*
+            let students = [{
+                    usi: "23dc59",
+                    name: "John Gray",
+                    email: "john@mysite.com",
+                    age: 26
+            }, {                  
+                    usi: "3d23fv",
+                    name: "Ben Lord",
+                    email: "ben@mysite.com",
+                    age: 28
+            }];
+
+            var studentsObjectStore = db.transaction("students", "readwrite").objectStore("students");
+
+            students.forEach(function (student){
+
+                let request = studentsObjectStore.add(student);
+
+                request.onsuccess = function () {
+                    console.log("Student added to the store", request.result);
+                };
+
+                request.onerror = function (){
+                    console.log("Error", request.error);
+                };
+
+            });*/
+            
+            //CITANJE PODATAKA IZ BAZE U NIZU (odjednom)
+
+            /*
+            var studentsObjectStore = db.transaction("students").objectStore("students");
+
+            studentsObjectStore.getAll().onsuccess = function (event){
+                let studentObj = event.target.result;
+
+                studentObj.forEach(function(student){
+
+                    console.log(student.usi);
+                    console.log(student.name);
+                    console.log(student.email);
+                    console.log(student.age);
+                });
+            };
+            */
+
+            //CITANJE PODATAKA IZ BAZE U NIZU (zapis po zapis)- CURSOR
+
+            var studentsObjectStore = db.transaction("students").objectStore("students");
+            studentsObjectStore.openCursor().onsuccess = function(event){
+
+                var cursor = event.target.result;
+
+                if (cursor){
+                    let studentObj = cursor.value;
+                    console.log(studentObj.usi);
+                    console.log(studentObj.name);
+                    console.log(studentObj.email);
+                    console.log(studentObj.age);
+                    cursor.continue();
+                }
+
+            }
+
+
+
+        };
+
+        request.onerror = function (event){
+            console.error("Error", event.target.error);
+        };
+
+
+    </script>
+</body>
+</html>
